@@ -1,0 +1,12 @@
+google-generativeai
+faiss-cpu
+yfinance
+feedparser
+pypdf
+requests
+python-dotenv
+numpy
+boto3
+pydantic
+fastapi
+uvicorn
