@@ -1,3 +1,4 @@
+import json
 from rag.pdf_loader import load_all_pdfs
 from rag.text_cleaner import clean_text
 from rag.chunker import chunk_text
@@ -23,8 +24,12 @@ def build_chunks():
         print(f" → Created {len(chunks)} chunks")
 
     print(f"Total chunks created: {len(all_chunks)}")
-    return all_chunks
 
+    # --- Save BEFORE returning ---
+    with open("data/processed/chunks.json", "w", encoding="utf-8") as f:
+        json.dump(all_chunks, f, indent=2)
+    
+    return all_chunks
 
 if __name__ == "__main__":
     build_chunks()
