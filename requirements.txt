@@ -2,7 +2,7 @@ google-genai
 faiss-cpu
 yfinance
 feedparser
-pypdf
+pdfplumber
 requests
 python-dotenv
 numpy
