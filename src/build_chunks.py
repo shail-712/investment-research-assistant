@@ -10,26 +10,35 @@ def build_chunks():
     for d in docs:
         print(f"Chunking {d['filename']}...")
 
+        # Determine company PER DOCUMENT
+        company = (
+            "NVIDIA" if "NVIDIA" in d["filename"] else
+            "AMD" if "AMD" in d["filename"] else
+            "Intel" if "Intel" in d["filename"] else
+            "Unknown"
+        )
+
         clean = clean_text(d["text"])
         chunks = chunk_text(clean, max_tokens=300, overlap=50)
 
-        # Attach metadata
         for i, chunk in enumerate(chunks):
             all_chunks.append({
                 "id": f"{d['filename']}_{i}",
                 "filename": d["filename"],
+                "company": company,
                 "text": chunk
             })
 
         print(f" → Created {len(chunks)} chunks")
 
-    print(f"Total chunks created: {len(all_chunks)}")
+    print(f"Total chunks: {len(all_chunks)}")
 
-    # --- Save BEFORE returning ---
-    with open("data/processed/chunks.json", "w", encoding="utf-8") as f:
+    with open("data/processed/chunks.json", "w") as f:
         json.dump(all_chunks, f, indent=2)
-    
+
     return all_chunks
+
+
 
 if __name__ == "__main__":
     build_chunks()

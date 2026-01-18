@@ -1,13 +1,10 @@
-#save embeddings + metadata to file
-
 import json
 import numpy as np
 import os
 
-from embedding_service import EmbeddingService
+from src.rag.embedding_service import EmbeddingService   # FIXED IMPORT
 
 def build_embeddings():
-    # Load chunks created in Step 3.2
     with open("data/processed/chunks.json", "r", encoding="utf-8") as f:
         chunks = json.load(f)
 
@@ -21,15 +18,17 @@ def build_embeddings():
     for chunk in chunks:
         emb = embedder.embed(chunk["text"])
         embeddings.append(emb)
+
+        # IMPORTANT: include the company field
         metadata.append({
             "id": chunk["id"],
             "filename": chunk["filename"],
+            "company": chunk["company"],   # <-- FIX
             "text": chunk["text"]
         })
 
     embeddings = np.array(embeddings, dtype="float32")
 
-    # Save results
     np.save("data/processed/embeddings.npy", embeddings)
 
     with open("data/processed/metadata.json", "w", encoding="utf-8") as f:
