@@ -19,7 +19,7 @@ class LLMService:
         )
 
         # Use the latest stable flash model
-        self.model = "models/gemini-2.5-flash"
+        self.model = "models/gemini-2.5-flash-lite-001"
 
     def generate(self, prompt: str) -> str:
         try:
