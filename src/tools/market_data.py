@@ -14,4 +14,5 @@ def get_market_data(ticker: str):
         "pe_ratio": info.get("trailingPE"),
         "eps": info.get("trailingEps"),
         
+        
     }

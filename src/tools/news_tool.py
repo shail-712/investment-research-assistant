@@ -20,6 +20,7 @@ def get_news(company: str, max_items=5):
             "published": entry.get("published", ""),
             "summary": entry.get("summary", ""),
             "link": entry.link
+            
         })
 
     return articles
