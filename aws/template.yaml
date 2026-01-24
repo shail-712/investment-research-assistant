@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Investment Research Agent - Free Tier Architecture
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 1024
+    Runtime: python3.12
+
+Resources:
+
+  AgentLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: lambdas/agent/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Environment:
+        Variables:
+          S3_BUCKET: investment-research-kb-shail
+
+  MarketDataLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: lambdas/market_data/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  NewsLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: lambdas/news/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+  RetrieverLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: lambdas/retriever/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3ReadPolicy:
+            BucketName: investment-research-kb-shail
+
+  AgentAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      EndpointConfiguration: REGIONAL
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: Investment Agent API
+        paths:
+          /ask:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: 
+                    - arn:aws:apigateway:${Region}:lambda:path/2015-03-31/functions/${AgentLambda.Arn}/invocations
+                    - { Region: !Ref AWS::Region }
