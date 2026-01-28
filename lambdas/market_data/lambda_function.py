@@ -11,11 +11,11 @@ def lambda_handler(event, context):
         # 2. Fetch data using yfinance
         stock = yf.Ticker(ticker)
 
-        price = stock.info.get("regularMarketPrice")
+        price = stock.fast_info.get("last_price")
+        volume = stock.fast_info.get("last_volume")
         open_price = stock.info.get("open")
         high = stock.info.get("dayHigh")
         low = stock.info.get("dayLow")
-        volume = stock.info.get("volume")
         market_cap = stock.info.get("marketCap")
         pe_ratio = stock.info.get("trailingPE")
 
