@@ -17,9 +17,27 @@ Resources:
       CodeUri: lambdas/agent/
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: lambda:InvokeFunction
+              Resource:
+                - !GetAtt MarketDataLambda.Arn
+                - !GetAtt NewsLambda.Arn
+                - !GetAtt RetrieverLambda.Arn
       Environment:
         Variables:
           S3_BUCKET: investment-research-kb-shail
+          GEMINI_API_KEY: !Sub "{{resolve:ssm:/investment-research/gemini-api-key}}"
+          MARKET_DATA_LAMBDA: !Ref MarketDataLambda
+          NEWS_LAMBDA: !Ref NewsLambda
+          RETRIEVER_LAMBDA: !Ref RetrieverLambda
+      Events:
+        AskApi:
+          Type: Api
+          Properties:
+            Path: /ask
+            Method: post
 
   MarketDataLambda:
     Type: AWS::Serverless::Function
@@ -42,10 +60,16 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       CodeUri: lambdas/retriever/
+      Environment:
+        Variables:
+          S3_BUCKET: investment-research-kb-shail
+          GEMINI_API_KEY: !Sub "{{resolve:ssm:/investment-research/gemini-api-key}}"
       Policies:
         - AWSLambdaBasicExecutionRole
         - S3ReadPolicy:
             BucketName: investment-research-kb-shail
+
+
 
   AgentAPI:
     Type: AWS::Serverless::Api
