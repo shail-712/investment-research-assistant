@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.aws-sam/
+.venv/
+venv/
+data/raw/
+data/processed/
+*.npy
+*.bin
+*.faiss
+.DS_Store
