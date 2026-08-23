@@ -29,7 +29,7 @@ User ──POST /ask──► API Gateway ──► AgentLambda (orchestrator)
 
 ---
 
-## Current State Snapshot (as of Phase 1 completion)
+## Current State Snapshot (as of Phase 2 in progress)
 
 | Component | File | Status |
 |-----------|------|--------|
@@ -39,14 +39,16 @@ User ──POST /ask──► API Gateway ──► AgentLambda (orchestrator)
 | Child-lambda invocation via boto3 | inside AgentLambda | ✅ Built |
 | Gemini synthesis call | inside AgentLambda | ✅ Built |
 | MarketDataLambda | `lambdas/market_data/lambda_function.py` | ✅ Built |
-| NewsLambda (stub) | `lambdas/news/lambda_function.py` | ⚠️ Basic skeleton only |
+| NewsLambda | `lambdas/news/lambda_function.py` | ✅ Built |
 | RetrieverLambda (stub) | `lambdas/retriever/lambda_function.py` | ⚠️ Basic skeleton only |
 | FAISS build + upload pipeline | `src/rag/build_faiss.py` | ✅ Built |
 | FAISS index artifact | `data/processed/faiss_index.bin` | ✅ Exists locally |
-| SAM template | `template.yaml` | ✅ Defined (not yet deployed) |
+| Local test runner | `test_local.py` | ✅ Built |
+| Local testing commands | `TESTING.md` | ✅ Written |
+| SAM template | `template.yaml` | ✅ Defined (pending new AWS account) |
 | DynamoDB caching | — | ❌ Not started |
 | API Gateway auth (API keys) | — | ❌ Not started |
-| Deployment to AWS | — | ❌ Not started |
+| Deployment to AWS | — | ⏸️ Paused (new AWS account needed) |
 
 ---
 
@@ -94,15 +96,16 @@ User ──POST /ask──► API Gateway ──► AgentLambda (orchestrator)
 **Resume bullet unlocked:**
 > "I traced part of the latency to yfinance's stock.info call and switched to fast_info, which brought observed development latency down significantly."
 
-### Task 2.2 — NewsLambda: Full Implementation
+### Task 2.2 — NewsLambda: Full Implementation ✅ DONE
 **File:** `lambdas/news/lambda_function.py`
 
-**Why:** Currently only returns titles. No link, no error handling if the RSS feed is unreachable.
+**Why:** Previously only returned titles. No link, no error handling if the RSS feed was unreachable.
 
-- [ ] Return full article objects: `{ title, link, published, summary }` (summary from RSS description if present)
-- [ ] Handle feedparser timeout / empty feed gracefully
-- [ ] Add logging
-- [ ] Keep top-5 articles as default but make it configurable via event payload
+- [x] Return full article objects: `{ title, link, published, summary }` (summary from RSS `<description>` tag)
+- [x] Handle feedparser timeout / empty feed gracefully — socket timeout guard + `bozo` check
+- [x] Add logging
+- [x] Keep top-5 articles as default but make it configurable via `count` field in event payload
+- [x] Case-insensitive company name input ("nvidia", "NVIDIA", "Nvidia" all work)
 
 ### Task 2.3 — RetrieverLambda: Full Implementation with Balanced Retrieval
 **File:** `lambdas/retriever/lambda_function.py`
