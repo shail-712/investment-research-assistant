@@ -38,7 +38,7 @@ User ──POST /ask──► API Gateway ──► AgentLambda (orchestrator)
 | Company + ticker extraction | inside AgentLambda | ✅ Built |
 | Child-lambda invocation via boto3 | inside AgentLambda | ✅ Built |
 | Gemini synthesis call | inside AgentLambda | ✅ Built |
-| MarketDataLambda (stub) | `lambdas/market_data/lambda_function.py` | ⚠️ Basic skeleton only |
+| MarketDataLambda | `lambdas/market_data/lambda_function.py` | ✅ Built |
 | NewsLambda (stub) | `lambdas/news/lambda_function.py` | ⚠️ Basic skeleton only |
 | RetrieverLambda (stub) | `lambdas/retriever/lambda_function.py` | ⚠️ Basic skeleton only |
 | FAISS build + upload pipeline | `src/rag/build_faiss.py` | ✅ Built |
@@ -80,16 +80,16 @@ User ──POST /ask──► API Gateway ──► AgentLambda (orchestrator)
 
 **What this phase does:** The three child lambdas are currently basic skeletons. This phase makes each one production-ready: proper error handling, correct response format, the balanced-retrieval fix for the RAG, and the full /tmp warm-start caching.
 
-### Task 2.1 — MarketDataLambda: Full Implementation
+### Task 2.1 — MarketDataLambda: Full Implementation ✅ DONE
 **File:** `lambdas/market_data/lambda_function.py`
 
-**Why:** Currently uses `stock.info` for most fields, which is the slow call. Also has no logging or graceful error handling.
+**Why:** Previously used `stock.info` for most fields, which is the slow call. Also had no logging or graceful error handling.
 
-- [ ] Switch all fields to `fast_info` where available (price, volume, market cap)
-- [ ] Keep only `.info` for fields not in `fast_info` (P/E, open, high, low)
-- [ ] Add structured logging (so CloudWatch shows what happened)
-- [ ] Validate ticker input; return clean error JSON if missing
-- [ ] Return consistent JSON format that AgentLambda already expects: `{ ticker, price, open, high, low, volume, market_cap, pe_ratio }`
+- [x] Switch all fields to `fast_info` where available (price, volume, market cap, high, low)
+- [x] Keep only `.info` for fields not in `fast_info` (P/E) — isolated in its own try/except so it can't crash the response
+- [x] Add structured logging (so CloudWatch shows what happened)
+- [x] Validate ticker input; return clean error JSON if missing
+- [x] Return consistent JSON format that AgentLambda already expects: `{ ticker, price, open, high, low, volume, market_cap, pe_ratio }`
 
 **Resume bullet unlocked:**
 > "I traced part of the latency to yfinance's stock.info call and switched to fast_info, which brought observed development latency down significantly."
